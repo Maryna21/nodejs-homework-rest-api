@@ -1,40 +1,52 @@
-// const fs = require('fs/promises')
-const contacts = require('./contacts.json')
-
-const { v4: uuidv4, parse, stringify } = require('uuid');
 const db = require('./db')
+const { ObjectID } = require('mongodb');
+
+const getCollection = async (db,name) =>{
+ const client = await db
+ const collection = await client.db().collection(name)
+ return collection
+}
 
 const listContacts = async () => {
-  return db.get('contacts').value()
+  const collection = await getCollection(db, 'contacts')
+  const results = await collection.find().toArray()
+  return results
 }
 
 const getContactById = async (contactId) => {
-  return db.get('contacts').find({id:contactId}).value()
+  const collection = await getCollection(db, 'contacts')
+  const objectId = new ObjectID(contactId)
+  const [result] = await collection.find({_id: objectId}).toArray()
+  return result
 }
 // console.log(getContactById('cc034bd4-7143-4690-a69a-dd8a805d5b6a'));
 
 const removeContact = async (id) => {
-const [record] = await db.get('contacts').remove({id}).write()
-return record
+  const collection = await getCollection(db, 'contacts')
+  const objectId = new ObjectID(id)
+  const {value: result} = await collection.findOneAndDelete({_id: objectId })
+return result
 //  console.log('delete', record); 
 }
 
 const addContact = async (body) => {
-  const id = uuidv4()
   const record = {
-    id,
     ...body
   }
-   db.get('contacts').push(record).write(record)
-  return record
+  const collection = await getCollection(db, 'contacts')
+  const {ops: [result]} = await collection.insertOne(record)
+  return result
 }
 
 const updateContact = async (id, body) => {
-  const record = await db.get('contacts').find({id}).assign(body).value()
-    db.write()
-    // console.log('record',record);
-    return record.id ? record : null
-  
+  const collection = await getCollection(db, 'contacts')
+  const objectId = new ObjectID(id)
+  const {value: result} = await collection.findOneAndUpdate(
+    {_id: objectId },
+    {$set: body},
+    {returnOriginal: false}
+    )
+  return result
 }
 
 module.exports = {

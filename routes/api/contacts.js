@@ -81,7 +81,7 @@ router.put('/:id', validateUpdateContact, async (req, res, next)=>{
   }
 })
 
-router.delete('/:contactId', async (req, res, next) => {
+router.delete('/:id', async (req, res, next) => {
   try {
     const contact = await Contacts.removeContact(req.params.id)
     if(contact){
