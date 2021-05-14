@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const { Schema, model } = mongoose;
+const { Schema, model, SchemaTypes} = mongoose;
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const contactSchema = new Schema({
     name: {
@@ -16,6 +17,10 @@ const contactSchema = new Schema({
               type: Boolean,
               default: false,
             },
+            owner: {
+              type: SchemaTypes.ObjectId,
+              ref: 'user',
+            }
 },
 {versionKey: false, 
   timestamps: true, 
@@ -29,10 +34,9 @@ toJSON: {virtuals: true,
   transform: function (doc,ret) {
   delete ret._id
   return ret
-}
-}
 },
-
+},
+},
 ) 
 
 contactSchema.path('name').validate((value)=>{
@@ -43,6 +47,8 @@ contactSchema.path('name').validate((value)=>{
 contactSchema.virtual('strAge').get(function (){
     return `${this.age} age`
 })
+
+contactSchema.plugin(mongoosePaginate);
 
 const Contact = model('contact', contactSchema)
 
