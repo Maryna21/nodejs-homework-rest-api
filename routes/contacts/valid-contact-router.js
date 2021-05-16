@@ -8,11 +8,41 @@ const schemaCreateContact = Joi.object({
         .required(),
 
         phone: Joi.number(),
-        // .pattern(new RegExp('{3}{ 3-4}')).required(),
 
         email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required()
+        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+        .required(),
+
+        favorite: Joi.boolean()
+        .optional()
 })
+
+const schemaQueryContact = Joi.object({
+    sortBy: Joi.string()
+        .valid('name', 'age', 'id')
+        .optional(),
+
+        sortByDesc: Joi.string()
+        .valid('name', 'age', 'id')
+        .optional(),
+
+        filter: Joi.string()
+        .optional(),
+
+        limit: Joi.number()
+        .integer()
+        .min(1)
+        .max(50)
+        .optional(),
+
+        offset: Joi.number()
+        .integer()
+        .min(0)
+        .optional(),
+
+        favorite: Joi.boolean()
+        .optional()
+}).without('sortBy', 'sortByDesc')
 
 const schemaUpdateContact = Joi.object({
     name: Joi.string()
@@ -39,6 +69,9 @@ const validate = async (schema, obj, next)=>{
 }
 
 module.exports = {
+    validateQueryContact: async (req, res, next)=>{
+        return await validate(schemaQueryContact, req.query, next)
+    },
     validateCreateContact: async (req, res, next)=>{
         return await validate(schemaCreateContact, req.body, next)
     },
