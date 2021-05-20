@@ -17,8 +17,8 @@ const updateToken = async (id, token) => {
     return await User.updateOne({_id: id}, {token})
 }
 
-const updateAvatar = async (id, avatar) => {
-    return await User.updateOne({_id: id}, {avatar})
+const updateAvatar = async (id, avatar, idCloudAvatar=nul) => {
+    return await User.updateOne({_id: id}, {avatar, idCloudAvatar})
 }
 
 module.exports = {

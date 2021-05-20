@@ -2,10 +2,20 @@ const jwt = require('jsonwebtoken')
 const jimp = require('jimp')
 const fs = require('fs/promises')
 const path = require('path')
+const cloudinary = require('cloudinary').v2
+const {promisify} = require('util')
 require('dotenv').config()
 const Users = require('../model/users')
 const {HttpCode} = require('../helper/constants')
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
+
+cloudinary.config({ 
+    cloud_name: process.env.CLOUD_NAME, 
+    api_key: process.env.CLOUD_API_KEY, 
+    api_secret: process.env.CLOUD_API_SECRET
+  })
+
+  const uploadToCloud = promisify(cloudinary.uploader.upload)
 
 const signup = async (req, res, next) => {
     const {email} = req.body
@@ -84,8 +94,9 @@ const current = (req, res, next) => {
 
     const updateAvatar = async (req, res, next) =>{
         const {id} = req.user
-        const avatarUrl = await saveAvatarUser(req)
-        await Users.updateAvatar(id, avatarUrl)
+        // const avatarUrl = await saveAvatarUser(req)//--static
+        const { idCloudAvatar, avatarUrl } = await saveAvatarUserToCloud(req) //cloudinary
+        await Users.updateAvatar(id, avatarUrl, idCloudAvatar)
         return res
         .status(HttpCode.OK)
         .json({status: 'success', code: HttpCode.OK, data: {avatarUrl} })
@@ -112,6 +123,21 @@ const current = (req, res, next) => {
         }
             console.log(req.user.avatar);
             return path.join(FOLDER_AVATARS, newNameAvatar).replace('\\', '/')
+    } //--static
+
+    const saveAvatarUserToCloud = async (req) => {
+        const pathFile = req.file.path
+     const {
+         public_id: idCloudAvatar,
+        secure_url: avatarUrl
+    } = await uploadToCloud(
+         pathFile, {
+         public_id: req.user.idCloudAvatar?.replace('Avatars/', ''),
+         folder: 'Avatars', 
+         transformation: { width: 250, height: 250, crop: 'pad'}
+    })
+    await fs.unlink(pathFile)
+    return { idCloudAvatar, avatarUrl }
     }
   
 module.exports = {
@@ -120,5 +146,5 @@ module.exports = {
     logout,
     current,
     updateUserStatus,
-    updateAvatar
+    updateAvatar,
 }

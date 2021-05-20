@@ -18,12 +18,13 @@ const storage = multer.diskStorage({
     fileFilter: (req, file, cb) => {
     if(file.mimetype.includes('image')){
         cb(null, true)
+        return
     }
-   
-    cb(null, false)
-   
-    
-  
-  } })
+    const err = new Error('This is not img file')
+    err.status = 400
+    cb(err)
+    // cb(null, false)
+  } 
+})
 
   module.exports = upload
