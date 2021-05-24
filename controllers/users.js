@@ -6,7 +6,7 @@ const cloudinary = require('cloudinary').v2
 const {promisify} = require('util')
 require('dotenv').config()
 const Users = require('../model/users')
-const {HttpCode} = require('../helper/constants')
+const {HttpCode} = require('../helpers/constants')
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 
 cloudinary.config({ 

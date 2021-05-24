@@ -1,9 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const ctrl = require('../../controllers/users')
-const guard = require('../../helper/guard')
+const guard = require('../../helpers/guard')
 const rateLimit = require("express-rate-limit")
-const uploadAvatar = require('../../helper/upload-avatar')
+const uploadAvatar = require('../../helpers/upload-avatar')
 
 const limiter = rateLimit({
     windowMs: 60 * 60 * 1000,

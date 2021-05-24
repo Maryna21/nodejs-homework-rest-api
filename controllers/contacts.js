@@ -3,12 +3,15 @@ const Contacts = require('../model/contacts')
 const getAll = async (req, res, next) => {
     try {
       const userId = req.user?.id
-      const contacts = await Contacts.listContacts(userId, req.query)
+      const {contacts, total, limit, offset} = await Contacts.listContacts(userId, req.query)
       return res.json({
         status: "success",
         code: 200,
         data: {
-          ...contacts,
+          contacts,
+          total,
+          limit,
+          offset,
         }
       })
     } catch (error) {
@@ -120,10 +123,10 @@ const getAll = async (req, res, next) => {
         return res.status(404).json({
         status: "error",
         code: 404,
-        data: "Not Found",
-        
-      })}}
-     catch (error) {
+        data: "Not Found",  
+      })
+    }
+  } catch (error) {
       next(error)
     }
   }

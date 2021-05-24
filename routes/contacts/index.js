@@ -7,9 +7,9 @@ const {
   validationObjectId,
   validateQueryContact
 } = require('./valid-contact-router')
-const guard = require('../../helper/guard')
-const status = require('../../helper/status')
-const {Subscription} = require('../../helper/constants')
+const guard = require('../../helpers/guard')
+const status = require('../../helpers/status')
+const {Subscription} = require('../../helpers/constants')
 
 router.get('/', guard, validateQueryContact, ctrl.getAll) 
 

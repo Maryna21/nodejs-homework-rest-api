@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { Schema, model } = mongoose
 const gravatar = require('gravatar')
-const {Subscription} = require('../../helper/constants')
+const {Subscription} = require('../../helpers/constants')
 const bcrypt = require('bcryptjs')
 const SALT_FACTOR = 6
 
